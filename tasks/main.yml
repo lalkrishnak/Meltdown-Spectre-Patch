@@ -1,0 +1,30 @@
+---
+# tasks file for spectre-meltdown-patch
+- name: Copy checking Script
+  copy:
+    src: spectre-meltdown-checker.sh
+    dest: /usr/local/bin/spectre-meltdown-checker
+    mode: 0755
+  tags:
+  - spectre
+  - meltdown
+
+- name: Check for spectre/meltdown vulnerabilities
+  command: spectre-meltdown-checker
+  register: spectre_meltdown_checker_result
+  failed_when: spectre_meltdown_checker_result.rc != 0
+  tags:
+  - spectre
+  - meltdown
+
+- debug:
+    var: spectre_meltdown_checker_result
+
+- name: Patch kernel
+  yum:
+    name: kernel
+    state: latest
+  register: patch_result
+
+- debug:
+    var: patch_result
